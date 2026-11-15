@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ event.name }}</title>
+    <link rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+        <p class="{{ category }}">{{ message }}</p>
+    {% endfor %}
+{% endwith %}
+
+    <h1>{{ event.name }}</h1>
+
+    <p>Date: {{ event.date }}</p>
+
+    <p>Venue: {{ event.venue }}</p>
+
+    <p>Capacity: {{ event.capacity }}</p>
+
+    <p>Description: {{ event.description }}</p>
+
+    <p>Ticket Price: ₹{{ event.ticket_price }}</p>
+
+    <a href="{{ url_for('register_attendee', event_id=event.id) }}">
+        <button>Register / RSVP</button>
+    </a>
+
+    <a href="{{ url_for('view_events') }}">Back to Events</a>
+    <a href="{{ url_for('view_attendees', event_id=event.id) }}">
+    View Attendees
+    </a>
+    <a class="btn"
+   href="{{ url_for('submit_feedback', event_id=event.id) }}">
+   Give Feedback
+    </a>
+
+</body>
+
+</html>

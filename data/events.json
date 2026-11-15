@@ -1,0 +1,20 @@
+[
+    {
+        "id": 1,
+        "name": "Python Workshop",
+        "date": "2026-10-18",
+        "venue": "Kochi",
+        "capacity": 50,
+        "description": "One day python workshop",
+        "ticket_price": 100.0
+    },
+    {
+        "id": 2,
+        "name": "flask workshop",
+        "date": "2026-11-20",
+        "venue": "Kochi",
+        "capacity": 2,
+        "description": "Oneday workshop on flask",
+        "ticket_price": 0.0
+    }
+]

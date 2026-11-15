@@ -1,0 +1,26 @@
+[
+    {
+        "id": 1,
+        "event_id": 2,
+        "name": "Anu",
+        "email": "anu@gmail.com",
+        "status": "Confirmed",
+        "registration_date": "2026-11-16"
+    },
+    {
+        "id": 2,
+        "event_id": 2,
+        "name": "Amal",
+        "email": "amal@gmail.com",
+        "status": "Confirmed",
+        "registration_date": "2026-11-16"
+    },
+    {
+        "id": 3,
+        "event_id": 2,
+        "name": "jemi",
+        "email": "jemi@gmail.com",
+        "status": "Waitlisted",
+        "registration_date": "2026-11-16"
+    }
+]

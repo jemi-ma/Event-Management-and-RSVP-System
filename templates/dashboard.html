@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Event Dashboard</title>
+    <link rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <h1>Event Management Dashboard</h1>
+
+    <h2>Overall Statistics</h2>
+
+    <div>
+        <h3>Total Events</h3>
+        <p>{{ total_events }}</p>
+    </div>
+
+    <div>
+        <h3>Total Registrations</h3>
+        <p>{{ total_registrations }}</p>
+    </div>
+
+    <div>
+        <h3>Confirmed Attendees</h3>
+        <p>{{ total_confirmed }}</p>
+    </div>
+
+    <div>
+        <h3>Waitlisted Attendees</h3>
+        <p>{{ total_waitlisted }}</p>
+    </div>
+
+    <div>
+        <h3>Total Estimated Revenue</h3>
+        <p>₹{{ "%.2f"|format(total_revenue) }}</p>
+    </div>
+
+    <hr>
+
+    <h2>Individual Event Summary</h2>
+
+    {% if event_summaries %}
+
+        <table border="1" cellpadding="10">
+
+            <tr>
+                <th>Event Name</th>
+                <th>Total Registered</th>
+                <th>Confirmed</th>
+                <th>Waitlisted</th>
+                <th>Revenue</th>
+            </tr>
+
+            {% for event in event_summaries %}
+
+            <tr>
+                <td>{{ event.event_name }}</td>
+                <td>{{ event.total_registered }}</td>
+                <td>{{ event.confirmed }}</td>
+                <td>{{ event.waitlisted }}</td>
+                <td>₹{{ "%.2f"|format(event.revenue) }}</td>
+            </tr>
+
+            {% endfor %}
+
+        </table>
+
+    {% else %}
+
+        <p>No events available.</p>
+
+    {% endif %}
+
+    <br>
+
+    <a href="{{ url_for('home') }}">Back to Home</a>
+
+</body>
+</html>

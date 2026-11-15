@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Attendee List</title>
+    <link rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <h1>Attendees - {{ event.name }}</h1>
+
+    <h3>Total Registrations: {{ attendees|length }}</h3>
+
+    {% if attendees %}
+
+        <table border="1" cellpadding="10">
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th>Registration Date</th>
+            </tr>
+
+            {% for attendee in attendees %}
+            <tr>
+                <td>{{ attendee.name }}</td>
+                <td>{{ attendee.email }}</td>
+                <td>{{ attendee.status }}</td>
+                <td>{{ attendee.registration_date }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+    {% else %}
+        <p>No registrations yet.</p>
+    {% endif %}
+
+    <br>
+    <a href="{{ url_for('event_details', event_id=event.id) }}">
+        Back to Event
+    </a>
+
+</body>
+</html>
