@@ -16,5 +16,14 @@
         "capacity": 2,
         "description": "Oneday workshop on flask",
         "ticket_price": 0.0
+    },
+    {
+        "id": 3,
+        "name": "MERN Workshop",
+        "date": "2026-11-25",
+        "venue": "Kozhikode",
+        "capacity": 5,
+        "description": "One day workshop",
+        "ticket_price": 20.0
     }
 ]

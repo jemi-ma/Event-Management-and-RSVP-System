@@ -22,5 +22,53 @@
         "email": "jemi@gmail.com",
         "status": "Waitlisted",
         "registration_date": "2026-11-16"
+    },
+    {
+        "id": 4,
+        "event_id": 3,
+        "name": "Jemima Asok",
+        "email": "jemi@gmail.com",
+        "status": "Confirmed",
+        "registration_date": "2026-11-16"
+    },
+    {
+        "id": 5,
+        "event_id": 3,
+        "name": "Nivedita",
+        "email": "nivi@gmail.com",
+        "status": "Confirmed",
+        "registration_date": "2026-11-16"
+    },
+    {
+        "id": 6,
+        "event_id": 3,
+        "name": "person3",
+        "email": "person3@gmail.com",
+        "status": "Confirmed",
+        "registration_date": "2026-11-16"
+    },
+    {
+        "id": 7,
+        "event_id": 3,
+        "name": "person4",
+        "email": "person4@gmail.com",
+        "status": "Confirmed",
+        "registration_date": "2026-11-16"
+    },
+    {
+        "id": 8,
+        "event_id": 3,
+        "name": "person5",
+        "email": "person5@gmail.com",
+        "status": "Confirmed",
+        "registration_date": "2026-11-16"
+    },
+    {
+        "id": 9,
+        "event_id": 3,
+        "name": "person6",
+        "email": "person6@gmail.com",
+        "status": "Waitlisted",
+        "registration_date": "2026-11-16"
     }
 ]

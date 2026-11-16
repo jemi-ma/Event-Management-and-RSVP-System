@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Login | Eventora{% endblock %}
+
+{% block content %}
+
+<div class="auth-page">
+
+    <div class="auth-container">
+
+        <div class="auth-header">
+            <span class="auth-tag">WELCOME BACK</span>
+            <h1>Login to Eventora</h1>
+            <p>Your next experience starts here.</p>
+        </div>
+
+        <div class="auth-card">
+
+            <div class="auth-icon">✦</div>
+
+            <h2>Sign In</h2>
+            <p class="auth-subtitle">Enter your account details to continue.</p>
+
+            <form method="POST">
+
+                <div class="auth-form-group">
+                    <label for="email">Email Address</label>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="Enter your email"
+                        required
+                    >
+                </div>
+
+                <div class="auth-form-group">
+                    <label for="password">Password</label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Enter your password"
+                        required
+                    >
+                </div>
+
+                <button type="submit" class="auth-submit">
+                    Login →
+                </button>
+
+            </form>
+
+            <div class="auth-footer">
+                Don't have an account?
+                <a href="{{ url_for('register_account') }}">Register</a>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,25 +1,178 @@
 
-from flask import Flask ,render_template,request, redirect, url_for, flash#Imports Flask framework
-import json, os
-from datetime import datetime, date
+from flask import (
+    Flask, render_template, request,
+    redirect, url_for, flash, session
+)
+
+from werkzeug.security import generate_password_hash, check_password_hash
+
+import json
+import os
 import re
+from datetime import datetime, date
+from functools import wraps
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 EVENTS_FILE = os.path.join(BASE_DIR, 'data', 'events.json')
 ATTENDEES_FILE = os.path.join(BASE_DIR, 'data', 'attendees.json')
 FEEDBACK_FILE = os.path.join(BASE_DIR, 'data', 'feedback.json')
-
+USERS_FILE = os.path.join(BASE_DIR, 'data', 'users.json')
 
 # Creating Flask application
 app = Flask(__name__) #Creates application instance
-app.secret_key = 'event-management-secret-key'
+app.secret_key = os.environ.get(
+    'SECRET_KEY',
+    'eventora-development-secret-key-change-before-deployment'
+)
 
+
+def role_required(required_role):
+
+    def decorator(route_function):
+
+        @wraps(route_function)
+        @login_required
+        def wrapper(*args, **kwargs):
+
+            if session.get('user_role') != required_role:
+                flash("You don't have permission to access this page.", "danger")
+
+                if session.get('user_role') == 'organizer':
+                    return redirect(url_for('dashboard'))
+
+                return redirect(url_for('view_events'))
+
+            return route_function(*args, **kwargs)
+
+        return wrapper
+
+    return decorator
 
 # Home route
 @app.route('/') #Defines the homepage URL
 def home(): #Function executed when homepage is requested
     return render_template('index.html')
+
+@app.route('/register-account', methods=['GET', 'POST'])
+def register_account():
+
+    if request.method == 'POST':
+
+        name = request.form.get('name', '').strip()
+        email = request.form.get('email', '').strip().lower()
+        password = request.form.get('password', '')
+        confirm_password = request.form.get('confirm_password', '')
+        role = request.form.get('role', '').strip().lower()
+
+        # Validate required fields
+        if not name or not email or not password or not confirm_password or not role:
+            flash("Please fill in all fields.", "danger")
+            return redirect(url_for('register_account'))
+
+        # Validate email
+        if not validate_email(email):
+            flash("Please enter a valid email address.", "danger")
+            return redirect(url_for('register_account'))
+
+        # Validate password
+        if len(password) < 8:
+            flash("Password must contain at least 8 characters.", "danger")
+            return redirect(url_for('register_account'))
+
+        if password != confirm_password:
+            flash("Passwords do not match.", "danger")
+            return redirect(url_for('register_account'))
+
+        # Validate role
+        if role not in ['organizer', 'attendee']:
+            flash("Invalid account role.", "danger")
+            return redirect(url_for('register_account'))
+
+        users = read_json(USERS_FILE)
+
+        # Check duplicate email
+        for user in users:
+            if user['email'] == email:
+                flash("An account with this email already exists.", "warning")
+                return redirect(url_for('register_account'))
+
+        # Generate user ID
+        user_id = max(
+            [user.get('id', 0) for user in users],
+            default=0
+        ) + 1
+
+        # Create user
+        new_user = {
+            "id": user_id,
+            "name": name,
+            "email": email,
+            "password": generate_password_hash(password),
+            "role": role,
+            "created_at": date.today().isoformat()
+        }
+
+        users.append(new_user)
+
+        if write_json(USERS_FILE, users):
+            flash("Account created successfully! Please login.", "success")
+            return redirect(url_for('login'))
+
+        flash("Unable to create account. Please try again.", "danger")
+
+    return render_template('register.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+
+    if request.method == 'POST':
+
+        email = request.form.get('email', '').strip().lower()
+        password = request.form.get('password', '')
+
+        if not email or not password:
+            flash("Please enter your email and password.", "danger")
+            return redirect(url_for('login'))
+
+        users = read_json(USERS_FILE)
+
+        user = next(
+            (u for u in users if u['email'] == email),
+            None
+        )
+
+        if user and check_password_hash(user['password'], password):
+
+            session['user_id'] = user['id']
+            session['user_name'] = user['name']
+            session['user_email'] = user['email']
+            session['user_role'] = user['role']
+
+            flash(f"Welcome back, {user['name']}!", "success")
+
+            if user['role'] == 'organizer':
+                return redirect(url_for('dashboard'))
+
+            return redirect(url_for('view_events'))
+
+        flash("Invalid email or password.", "danger")
+
+    return render_template('login.html')
+
+
+
+
+@app.route('/logout')
+def logout():
+
+    session.clear()
+
+    flash("You have been logged out successfully.", "success")
+
+    return redirect(url_for('login'))
+
+
 
 @app.route('/events')
 def view_events():
@@ -131,6 +284,7 @@ def register_attendee(event_id):
     return render_template('rsvp.html', event=selected_event)
 
 @app.route('/attendees/<int:event_id>')
+@role_required('organizer')
 def view_attendees(event_id):
     events = read_json(EVENTS_FILE)
 
@@ -188,23 +342,106 @@ def event_categories():
         past_events=past_events
     )
 
+
+
+@app.route('/create-event', methods=['GET', 'POST'])
+@role_required('organizer')
+def create_event():
+    
+
+
+    if request.method == 'POST':
+
+        # Receive form data
+        name = request.form.get('name', '').strip()
+        event_date = request.form.get('date', '').strip()
+        venue = request.form.get('venue', '').strip()
+        capacity = request.form.get('capacity', '').strip()
+        description = request.form.get('description', '').strip()
+        ticket_price = request.form.get('ticket_price', '0').strip()
+
+        # Validate required fields
+        if not name or not event_date or not venue or not capacity:
+            flash("Please fill in all required fields.", "danger")
+            return redirect(url_for('create_event'))
+
+        # Validate date
+        if not validate_event_date(event_date):
+            flash("Please enter a valid future event date.", "danger")
+            return redirect(url_for('create_event'))
+
+        # Validate capacity and ticket price
+        try:
+            capacity = int(capacity)
+            ticket_price = float(ticket_price)
+
+            if capacity <= 0 or ticket_price < 0:
+                raise ValueError
+
+        except ValueError:
+            flash("Enter a valid capacity and ticket price.", "danger")
+            return redirect(url_for('create_event'))
+
+        # Read existing events
+        events = read_json(EVENTS_FILE)
+
+        # Generate unique event ID
+        event_id = max(
+            [event.get('id', 0) for event in events],
+            default=0
+        ) + 1
+
+        # Create event dictionary
+        new_event = {
+            "id": event_id,
+            "name": name,
+            "date": event_date,
+            "venue": venue,
+            "capacity": capacity,
+            "description": description,
+            "ticket_price": ticket_price
+        }
+
+        # Save event
+        events.append(new_event)
+
+        if write_json(EVENTS_FILE, events):
+            flash("Event created successfully!", "success")
+            return redirect(url_for('view_events'))
+
+        flash("Unable to save event. Please try again.", "danger")
+
+        return redirect(url_for('create_event'))
+
+    return render_template('create_event.html')
+
 @app.route('/dashboard')
+@role_required('organizer')
 def dashboard():
 
     events = read_json(EVENTS_FILE)
     attendees = read_json(ATTENDEES_FILE)
 
     total_events = len(events)
-    total_registrations = len(attendees)
+
+    total_registrations = sum(
+    1 for attendee in attendees
+    if attendee.get('status') in ['Confirmed', 'Waitlisted']
+    )
 
     total_confirmed = sum(
-        1 for attendee in attendees
-        if attendee.get('status') == 'Confirmed'
+    1 for attendee in attendees
+    if attendee.get('status') == 'Confirmed'
     )
 
     total_waitlisted = sum(
-        1 for attendee in attendees
-        if attendee.get('status') == 'Waitlisted'
+    1 for attendee in attendees
+    if attendee.get('status') == 'Waitlisted'
+    )
+
+    total_cancelled = sum(
+    1 for attendee in attendees
+    if attendee.get('status') == 'Cancelled'
     )
 
     event_summaries = []
@@ -225,7 +462,7 @@ def dashboard():
         total_confirmed=total_confirmed,
         total_waitlisted=total_waitlisted,
         total_revenue=total_revenue,
-        event_summaries=event_summaries
+        event_summaries=event_summaries,total_cancelled=total_cancelled,
     )
 @app.route('/feedback/<int:event_id>', methods=['GET', 'POST'])
 def submit_feedback(event_id):
@@ -310,6 +547,7 @@ def submit_feedback(event_id):
 
 
 @app.route('/feedbacks/<int:event_id>')
+@role_required('organizer')
 def view_feedback(event_id):
 
     events = read_json(EVENTS_FILE)
@@ -347,6 +585,20 @@ def view_feedback(event_id):
         average_rating=average_rating
     )
 
+def login_required(route_function):
+
+    @wraps(route_function)
+    def wrapper(*args, **kwargs):
+
+        if 'user_id' not in session:
+            flash("Please login to access this page.", "warning")
+            return redirect(url_for('login'))
+
+        return route_function(*args, **kwargs)
+
+    return wrapper
+
+
 def count_confirmed(event_id):
 
     attendees = read_json(ATTENDEES_FILE)
@@ -361,7 +613,6 @@ def count_confirmed(event_id):
             count += 1
 
     return count
-
 def calculate_event_summary(event, attendees):
 
     event_attendees = [
@@ -379,7 +630,12 @@ def calculate_event_summary(event, attendees):
         if attendee.get('status') == 'Waitlisted'
     )
 
-    total_registered = len(event_attendees)
+    cancelled = sum(
+        1 for attendee in event_attendees
+        if attendee.get('status') == 'Cancelled'
+    )
+
+    total_registered = confirmed + waitlisted
 
     ticket_price = float(event.get('ticket_price', 0))
 
@@ -390,8 +646,104 @@ def calculate_event_summary(event, attendees):
         "total_registered": total_registered,
         "confirmed": confirmed,
         "waitlisted": waitlisted,
+        "cancelled": cancelled,
         "revenue": revenue
     }
+
+@app.route('/my-registrations')
+@role_required('attendee')
+def my_registrations():
+
+    attendees = read_json(ATTENDEES_FILE)
+    events = read_json(EVENTS_FILE)
+
+    user_email = session.get('user_email')
+
+    my_registrations = []
+
+    for attendee in attendees:
+
+        if attendee.get('email') == user_email:
+
+            event = next(
+                (e for e in events if e['id'] == attendee['event_id']),
+                None
+            )
+
+            if event:
+                my_registrations.append({
+                    "registration": attendee,
+                    "event": event
+                })
+
+    return render_template(
+        'my_registrations.html',
+        registrations=my_registrations
+    )
+
+@app.route('/cancel-registration/<int:attendee_id>', methods=['POST'])
+@role_required('attendee')
+def cancel_registration(attendee_id):
+
+    attendees = read_json(ATTENDEES_FILE)
+
+    user_email = session.get('user_email')
+
+    # Find the attendee's registration
+    registration = next(
+        (
+            a for a in attendees
+            if a.get('id') == attendee_id
+            and a.get('email') == user_email
+        ),
+        None
+    )
+
+    if not registration:
+        flash("Registration not found.", "danger")
+        return redirect(url_for('my_registrations'))
+
+    if registration.get('status') == 'Cancelled':
+        flash("This registration is already cancelled.", "warning")
+        return redirect(url_for('my_registrations'))
+
+    previous_status = registration.get('status')
+
+    # Cancel the registration
+    registration['status'] = 'Cancelled'
+
+    # Promote the earliest waitlisted attendee
+    if previous_status == 'Confirmed':
+
+        waitlisted = [
+            a for a in attendees
+            if a.get('event_id') == registration.get('event_id')
+            and a.get('status') == 'Waitlisted'
+        ]
+
+        if waitlisted:
+
+            next_attendee = min(
+                waitlisted,
+                key=lambda a: (a.get('id', 0))
+            )
+
+            next_attendee['status'] = 'Confirmed'
+
+            flash(
+                "Registration cancelled. A waitlisted attendee has been promoted.",
+                "success"
+            )
+
+        else:
+            flash("Registration cancelled successfully.", "success")
+
+    else:
+        flash("Waitlist registration cancelled successfully.", "success")
+
+    write_json(ATTENDEES_FILE, attendees)
+
+    return redirect(url_for('my_registrations'))
 
 def validate_email(email):
     pattern = r'^[\w.-]+@[\w.-]+\.[A-Za-z]{2,}$'
@@ -444,74 +796,6 @@ def validate_event_date(event_date):
     except ValueError:
         return False
 
-
-@app.route('/create-event', methods=['GET', 'POST'])
-def create_event():
-
-    if request.method == 'POST':
-
-        # Receive form data
-        name = request.form.get('name', '').strip()
-        event_date = request.form.get('date', '').strip()
-        venue = request.form.get('venue', '').strip()
-        capacity = request.form.get('capacity', '').strip()
-        description = request.form.get('description', '').strip()
-        ticket_price = request.form.get('ticket_price', '0').strip()
-
-        # Validate required fields
-        if not name or not event_date or not venue or not capacity:
-            flash("Please fill in all required fields.", "danger")
-            return redirect(url_for('create_event'))
-
-        # Validate date
-        if not validate_event_date(event_date):
-            flash("Please enter a valid future event date.", "danger")
-            return redirect(url_for('create_event'))
-
-        # Validate capacity and ticket price
-        try:
-            capacity = int(capacity)
-            ticket_price = float(ticket_price)
-
-            if capacity <= 0 or ticket_price < 0:
-                raise ValueError
-
-        except ValueError:
-            flash("Enter a valid capacity and ticket price.", "danger")
-            return redirect(url_for('create_event'))
-
-        # Read existing events
-        events = read_json(EVENTS_FILE)
-
-        # Generate unique event ID
-        event_id = max(
-            [event.get('id', 0) for event in events],
-            default=0
-        ) + 1
-
-        # Create event dictionary
-        new_event = {
-            "id": event_id,
-            "name": name,
-            "date": event_date,
-            "venue": venue,
-            "capacity": capacity,
-            "description": description,
-            "ticket_price": ticket_price
-        }
-
-        # Save event
-        events.append(new_event)
-
-        if write_json(EVENTS_FILE, events):
-            flash("Event created successfully!", "success")
-            return redirect(url_for('view_events'))
-
-        flash("Unable to save event. Please try again.", "danger")
-
-        return redirect(url_for('create_event'))
-
-    return render_template('create_event.html')
 
 # Run the application
 if __name__ == '__main__':

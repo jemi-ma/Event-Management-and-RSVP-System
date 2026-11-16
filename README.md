@@ -1,68 +1,71 @@
-# Event Management & RSVP System
+# Eventora – Event Management & RSVP System
 
-## Project Overview
+Eventora is a web-based Event Management and RSVP System developed using Python and Flask. It provides a simple platform for organizers to create and manage events while allowing attendees to explore events, register, manage their registrations, and submit feedback.
 
-The Event Management & RSVP System is a web-based application developed using Python Flask. It helps users create and manage events, register attendees, monitor event capacity, and track registrations.
-
-The application provides a centralized platform for managing college events, workshops, weddings, and other gatherings.
-
-## Technologies Used
-
-- Python
-- Flask
-- HTML5
-- CSS3
-- JavaScript
-- JSON for file-based data storage
+The project demonstrates Python programming concepts, Flask application development, JSON-based file handling, user authentication, and role-based access control.
 
 ## Features
 
-### 1. Event Management
-- Create new events.
-- Enter event name, date, venue, capacity, ticket price, and description.
-- View available events.
+### User Management
+- User registration and login.
+- Secure password hashing.
+- Session-based authentication.
+- Role-based access for organizers and attendees.
+- Logout functionality.
 
-### 2. RSVP Registration
-- Register attendees for events.
-- Validate attendee information.
+### Event Management
+- Create and manage events.
+- View upcoming and past events.
+- Display event details, venue, date, capacity, and ticket price.
+- Event capacity management.
+
+### RSVP and Registration
+- Register for events.
 - Prevent duplicate registrations.
-- Check event capacity automatically.
+- Confirm registrations based on available capacity.
+- Automatically add attendees to a waitlist when an event is full.
+- View personal registrations.
+- Cancel registrations.
+- Automatically promote a waitlisted attendee when a confirmed registration is cancelled.
 
-### 3. Waitlist Management
-- Confirm registrations when seats are available.
-- Add additional registrations to the waitlist when an event is full.
+### Organizer Dashboard
+- View event statistics.
+- Track total registrations, confirmed registrations, waitlisted attendees, and cancellations.
+- Calculate event revenue.
+- View attendee information.
+- Search attendees by name or email.
+- Filter attendees by registration status.
 
-### 4. Attendee Management
-- View registered attendees.
-- Display attendee details and registration status.
+### Feedback Management
+- Submit feedback for completed events.
+- Provide ratings and comments.
+- View feedback submitted for individual events.
+- Calculate average event ratings.
 
-### 5. Event Categorization
-- Display upcoming events.
-- Display past events based on event dates.
+## User Roles
 
-### 6. Dashboard
-- Display total events.
-- Display total registrations.
-- Track confirmed and waitlisted attendees.
-- Calculate estimated event revenue.
+| Role | Access |
+|---|---|
+| Organizer | Create events, access the dashboard, view attendees, and manage event feedback. |
+| Attendee | Explore events, register, view personal registrations, and cancel registrations. |
+| Public Visitor | Browse available events and view event details. |
 
-### 7. Feedback System
-- Collect attendee feedback.
-- Allow users to provide ratings and comments.
+## Technologies Used
 
-### 8. Input Validation and Exception Handling
-- Validate user inputs.
-- Handle invalid dates and numerical values.
-- Handle JSON file errors.
+- **Programming Language:** Python
+- **Backend Framework:** Flask
+- **Frontend:** HTML, CSS, JavaScript
+- **Templating Engine:** Jinja2
+- **Data Storage:** JSON files
+- **Authentication:** Flask Sessions and Werkzeug Password Hashing
+- **Development Environment:** Visual Studio Code
 
 ## Project Structure
 
 ```text
-event_management_and_RSVP_system_using_flask/
+Event-Management-and-RSVP-System/
 │
 ├── app.py
-├── requirements.txt
-├── README.md
 │
 ├── templates/
 │   ├── base.html
@@ -74,7 +77,11 @@ event_management_and_RSVP_system_using_flask/
 │   ├── attendees.html
 │   ├── event_categories.html
 │   ├── dashboard.html
-│   └── feedback.html
+│   ├── feedback.html
+│   ├── view_feedback.html
+│   ├── register.html
+│   ├── login.html
+│   └── my_registrations.html
 │
 ├── static/
 │   ├── css/
@@ -86,72 +93,99 @@ event_management_and_RSVP_system_using_flask/
 ├── data/
 │   ├── events.json
 │   ├── attendees.json
-│   └── feedback.json
+│   ├── feedback.json
+│   └── users.json
 │
-└── venv/
+├── requirements.txt
+├── README.md
+└── .gitignore
 ```
 
 ## Installation and Setup
 
-### Step 1: Clone the repository
+### 1. Clone the Repository
 
 ```bash
-git clone YOUR_GITHUB_REPOSITORY_URL
+git clone https://github.com/jemi-ma/Event-Management-and-RSVP-System.git
 ```
 
-### Step 2: Navigate to the project directory
+### 2. Navigate to the Project Directory
 
 ```bash
-cd event_management_and_RSVP_system_using_flask
+cd Event-Management-and-RSVP-System
 ```
 
-### Step 3: Create a virtual environment
+### 3. Create a Virtual Environment
 
 ```bash
 python -m venv venv
 ```
 
-### Step 4: Activate the virtual environment
+### 4. Activate the Virtual Environment
 
-Windows:
+For Windows:
 
 ```bash
 venv\Scripts\activate
 ```
 
-### Step 5: Install dependencies
+### 5. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### Step 6: Run the application
+### 6. Run the Application
 
 ```bash
 python app.py
 ```
 
-### Step 7: Open the application
+### 7. Open in Browser
 
 Visit:
 
+```text
 http://127.0.0.1:5000/
+```
 
 ## Data Storage
 
-The application uses JSON files to store event information, attendee registrations, and feedback.
+Eventora uses JSON files for storing application data:
 
-This provides simple file-based storage without requiring a separate database server.
+- `events.json` – Event information.
+- `attendees.json` – Event registration details.
+- `feedback.json` – Event feedback and ratings.
+- `users.json` – User account information.
+
+This project uses JSON-based storage instead of a relational database to demonstrate file handling and data manipulation using Python.
+
+## Python Concepts Demonstrated
+
+- Functions and modular programming.
+- Lists and dictionaries.
+- File handling and JSON operations.
+- Exception handling.
+- Conditional statements and loops.
+- Data validation.
+- Decorators.
+- Password hashing.
+- Session management.
+- Flask routing and request handling.
 
 ## Future Enhancements
 
-- Email-based event confirmation.
-- Calendar integration.
-- Online payment integration.
-- User authentication and authorization.
-- Automated waitlist promotion.
-- Database integration using MySQL or SQLite.
+- Database integration using MySQL or MongoDB.
+- Email notifications for event registrations.
+- Enhanced user profile management.
+- Improved event administration features.
 
 ## Author
 
-Developed as a Python Flask mini project.
+**Jemima Asok**
+
+GitHub: https://github.com/jemi-ma
+
+---
+
+*Eventora – Making event management simpler.*

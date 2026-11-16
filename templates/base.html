@@ -19,27 +19,47 @@
 </head>
 
 <body>
+<header class="navbar">
+    <div class="nav-container">
 
-    <header class="navbar">
-        <div class="nav-container">
+        <a href="{{ url_for('home') }}" class="logo">
+            Event<span>ora.</span>
+        </a>
 
-            <a href="{{ url_for('home') }}" class="logo">
-                Event<span>ora.</span>
-            </a>
+        <nav>
+            <a href="{{ url_for('home') }}">Home</a>
+            <a href="{{ url_for('view_events') }}">Explore Events</a>
+            <a href="{{ url_for('event_categories') }}">Upcoming</a>
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            {% if session.get('user_role') == 'attendee' %}
+    <a href="{{ url_for('my_registrations') }}">My Registrations</a>
+{% endif %}
+        </nav>
 
-            <nav>
-                <a href="{{ url_for('home') }}">Home</a>
-                <a href="{{ url_for('view_events') }}">Explore Events</a>
-                <a href="{{ url_for('event_categories') }}">Upcoming</a>
-                <a href="{{ url_for('dashboard') }}">Dashboard</a>
-            </nav>
+        <div class="nav-actions">
 
-            <a href="{{ url_for('create_event') }}" class="nav-button">
-                + Create Event
-            </a>
+            {% if session.get('user_id') %}
+                <span class="nav-link">
+                    Hi, {{ session.get('user_name') }}
+                </span>
+
+                <a href="{{ url_for('logout') }}" class="nav-button">
+                    Logout
+                </a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="nav-button">
+                    Login
+                </a>
+
+                <a href="{{ url_for('register_account') }}" class="nav-button">
+                    Sign Up
+                </a>
+            {% endif %}
 
         </div>
-    </header>
+
+    </div>
+</header>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% for category, message in messages %}
@@ -51,6 +71,8 @@
 
     {% block content %}
     {% endblock %}
+
+    
 
     <footer class="footer">
         <h3>Eventora.</h3>

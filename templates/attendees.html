@@ -1,21 +1,11 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Attendee List</title>
-    <link rel="stylesheet"
-      href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body>
-
-    {% extends "base.html" %}
+?variant="code" id="63821" title="Attendees template"
+{% extends "base.html" %}
 
 {% block title %}Attendees | Eventora{% endblock %}
 
 {% block content %}
 
 <section class="attendees-page">
-
-    <!-- HEADER -->
 
     <div class="attendees-breadcrumb">
         <a href="{{ url_for('view_events') }}">Explore Events</a>
@@ -64,6 +54,13 @@
             <small>Waiting for seats</small>
         </div>
 
+        <div class="attendee-stat-card">
+            <div class="attendee-stat-icon red">✕</div>
+            <p>Cancelled</p>
+            <h2>{{ attendees|selectattr('status', 'equalto', 'Cancelled')|list|length }}</h2>
+            <small>Cancelled registrations</small>
+        </div>
+
     </div>
 
     <!-- ATTENDEE TABLE -->
@@ -76,12 +73,29 @@
                 <p>{{ event.name }}</p>
             </div>
 
-            <span class="attendee-count">
+            <span class="attendee-count" id="visibleCount">
                 {{ attendees|length }} People
             </span>
         </div>
 
         {% if attendees %}
+
+        <!-- SEARCH AND FILTER -->
+
+        <div class="attendee-controls">
+
+            <input type="text"
+                   id="attendeeSearch"
+                   placeholder="Search by name or email...">
+
+            <select id="statusFilter">
+                <option value="all">All Statuses</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="waitlisted">Waitlisted</option>
+                <option value="cancelled">Cancelled</option>
+            </select>
+
+        </div>
 
         <div class="attendee-table-wrapper">
 
@@ -96,11 +110,15 @@
                     </tr>
                 </thead>
 
-                <tbody>
+                <tbody id="attendeeTableBody">
 
                     {% for attendee in attendees %}
 
-                    <tr>
+                    <tr class="attendee-row"
+                        data-name="{{ attendee.name|lower }}"
+                        data-email="{{ attendee.email|lower }}"
+                        data-status="{{ attendee.status|lower }}">
+
                         <td>
                             <div class="attendee-name">
                                 <div class="attendee-avatar">
@@ -119,12 +137,19 @@
                                 <span class="status-badge confirmed">
                                     ✓ Confirmed
                                 </span>
-                            {% else %}
+
+                            {% elif attendee.status == 'Waitlisted' %}
                                 <span class="status-badge waitlisted">
                                     ◷ Waitlisted
                                 </span>
+
+                            {% else %}
+                                <span class="status-badge cancelled">
+                                    ✕ Cancelled
+                                </span>
                             {% endif %}
                         </td>
+
                     </tr>
 
                     {% endfor %}
@@ -133,22 +158,23 @@
 
             </table>
 
+            <div id="noFilterResults" class="filter-empty" style="display:none;">
+                <h3>No matching attendees</h3>
+                <p>Try changing your search or status filter.</p>
+            </div>
+
         </div>
 
         {% else %}
 
         <div class="attendee-empty">
-
             <div class="empty-icon">♧</div>
-
             <h3>No registrations yet</h3>
-
             <p>When people register for this event, they'll appear here.</p>
 
             <a href="{{ url_for('event_details', event_id=event.id) }}">
                 View Event Details →
             </a>
-
         </div>
 
         {% endif %}
@@ -157,6 +183,56 @@
 
 </section>
 
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const searchInput = document.getElementById("attendeeSearch");
+    const statusFilter = document.getElementById("statusFilter");
+    const rows = document.querySelectorAll(".attendee-row");
+    const visibleCount = document.getElementById("visibleCount");
+    const noResults = document.getElementById("noFilterResults");
+
+    if (!searchInput || !statusFilter) return;
+
+    function filterAttendees() {
+
+        const searchValue = searchInput.value.toLowerCase().trim();
+        const selectedStatus = statusFilter.value;
+
+        let visible = 0;
+
+        rows.forEach(function (row) {
+
+            const name = row.dataset.name;
+            const email = row.dataset.email;
+            const status = row.dataset.status;
+
+            const matchesSearch =
+                name.includes(searchValue) ||
+                email.includes(searchValue);
+
+            const matchesStatus =
+                selectedStatus === "all" ||
+                status === selectedStatus;
+
+            if (matchesSearch && matchesStatus) {
+                row.style.display = "";
+                visible++;
+            } else {
+                row.style.display = "none";
+            }
+
+        });
+
+        visibleCount.textContent = visible + " People";
+
+        noResults.style.display = visible === 0 ? "block" : "none";
+    }
+
+    searchInput.addEventListener("input", filterAttendees);
+    statusFilter.addEventListener("change", filterAttendees);
+
+});
+</script>
+
 {% endblock %}
-</body>
-</html>

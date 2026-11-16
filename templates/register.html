@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Create Account | Eventora{% endblock %}
+
+{% block content %}
+
+<div class="auth-page">
+
+    <div class="auth-container">
+
+        <div class="auth-header">
+            <span class="auth-tag">WELCOME TO EVENTORA</span>
+            <h1>Create Your Account</h1>
+            <p>Join Eventora and become part of amazing experiences.</p>
+        </div>
+
+        <div class="auth-card">
+
+            <div class="auth-icon">✦</div>
+
+            <h2>Get Started</h2>
+            <p class="auth-subtitle">Create an account to continue.</p>
+
+            <form method="POST">
+
+                <div class="auth-form-group">
+                    <label for="name">Full Name</label>
+                    <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        placeholder="Enter your full name"
+                        required
+                    >
+                </div>
+
+                <div class="auth-form-group">
+                    <label for="email">Email Address</label>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="Enter your email"
+                        required
+                    >
+                </div>
+
+                <div class="auth-form-group">
+                    <label for="password">Password</label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Create a password (minimum 8 characters)"
+                        minlength="8"
+                        required
+                    >
+                </div>
+
+                <div class="auth-form-group">
+                    <label for="confirm_password">Confirm Password</label>
+                    <input
+                        type="password"
+                        id="confirm_password"
+                        name="confirm_password"
+                        placeholder="Re-enter your password"
+                        required
+                    >
+                </div>
+
+                <div class="auth-form-group">
+                    <label for="role">Choose Account Type</label>
+
+                    <select id="role" name="role" required>
+                        <option value="">Select your role</option>
+                        <option value="organizer">Event Organizer</option>
+                        <option value="attendee">Event Attendee</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="auth-submit">
+                    Create Account →
+                </button>
+
+            </form>
+
+            <div class="auth-footer">
+                Already have an account?
+                <a href="{{ url_for('login') }}">Login</a>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

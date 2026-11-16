@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}My Registrations | Eventora{% endblock %}
+
+{% block content %}
+
+<section class="my-registrations-page">
+
+    <div class="page-heading">
+        <span class="section-tag">MY EVENTS</span>
+        <h1>My Registrations</h1>
+        <p>Keep track of the events you've registered for.</p>
+    </div>
+
+    {% if registrations %}
+
+        <div class="registration-grid">
+
+            {% for item in registrations %}
+
+                <div class="registration-card">
+
+                    <h3>{{ item.event.name }}</h3>
+
+                    <p>
+                        <strong>Date:</strong>
+                        {{ item.event.date }}
+                    </p>
+
+                    <p>
+                        <strong>Venue:</strong>
+                        {{ item.event.venue }}
+                    </p>
+
+                    <p>
+                        <strong>Registration Status:</strong>
+
+                        <span class="status-badge
+                        {{ item.registration.status|lower }}">
+                            {{ item.registration.status }}
+                        </span>
+                    </p>
+
+                    <a href="{{ url_for('event_details',
+                    event_id=item.event.id) }}" class="nav-button">
+                        View Event
+                    </a>
+                    {% if item.registration.status != 'Cancelled' %}
+
+    <form method="POST"
+          action="{{ url_for('cancel_registration',
+          attendee_id=item.registration.id) }}"
+          onsubmit="return confirm('Are you sure you want to cancel this registration?');">
+
+        <button type="submit" class="cancel-button">
+            Cancel Registration
+        </button>
+
+    </form>
+
+{% endif %}
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="empty-state">
+            <h3>No registrations yet!</h3>
+            <p>You haven't registered for any events.</p>
+
+            <a href="{{ url_for('view_events') }}" class="nav-button">
+                Explore Events
+            </a>
+        </div>
+
+    {% endif %}
+
+</section>
+
+{% endblock %}
