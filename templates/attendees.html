@@ -7,38 +7,156 @@
 </head>
 <body>
 
-    <h1>Attendees - {{ event.name }}</h1>
+    {% extends "base.html" %}
 
-    <h3>Total Registrations: {{ attendees|length }}</h3>
+{% block title %}Attendees | Eventora{% endblock %}
 
-    {% if attendees %}
+{% block content %}
 
-        <table border="1" cellpadding="10">
-            <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Status</th>
-                <th>Registration Date</th>
-            </tr>
+<section class="attendees-page">
 
-            {% for attendee in attendees %}
-            <tr>
-                <td>{{ attendee.name }}</td>
-                <td>{{ attendee.email }}</td>
-                <td>{{ attendee.status }}</td>
-                <td>{{ attendee.registration_date }}</td>
-            </tr>
-            {% endfor %}
-        </table>
+    <!-- HEADER -->
 
-    {% else %}
-        <p>No registrations yet.</p>
-    {% endif %}
+    <div class="attendees-breadcrumb">
+        <a href="{{ url_for('view_events') }}">Explore Events</a>
+        <span>/</span>
+        <a href="{{ url_for('event_details', event_id=event.id) }}">
+            {{ event.name }}
+        </a>
+        <span>/ Attendees</span>
+    </div>
 
-    <br>
-    <a href="{{ url_for('event_details', event_id=event.id) }}">
-        Back to Event
-    </a>
+    <div class="attendees-heading">
+        <div>
+            <span class="section-tag">✦ EVENT MANAGEMENT</span>
+            <h1>Attendee Overview</h1>
+            <p>Manage and track everyone registered for your event.</p>
+        </div>
 
+        <a href="{{ url_for('event_details', event_id=event.id) }}"
+           class="attendee-back-btn">
+            ← Back to Event
+        </a>
+    </div>
+
+    <!-- STATISTICS -->
+
+    <div class="attendee-stats">
+
+        <div class="attendee-stat-card">
+            <div class="attendee-stat-icon purple">♧</div>
+            <p>Total Registrations</p>
+            <h2>{{ attendees|length }}</h2>
+            <small>All registrations</small>
+        </div>
+
+        <div class="attendee-stat-card">
+            <div class="attendee-stat-icon green">✓</div>
+            <p>Confirmed</p>
+            <h2>{{ attendees|selectattr('status', 'equalto', 'Confirmed')|list|length }}</h2>
+            <small>Seats confirmed</small>
+        </div>
+
+        <div class="attendee-stat-card">
+            <div class="attendee-stat-icon orange">◷</div>
+            <p>Waitlisted</p>
+            <h2>{{ attendees|selectattr('status', 'equalto', 'Waitlisted')|list|length }}</h2>
+            <small>Waiting for seats</small>
+        </div>
+
+    </div>
+
+    <!-- ATTENDEE TABLE -->
+
+    <div class="attendee-table-card">
+
+        <div class="attendee-table-heading">
+            <div>
+                <h2>Registered Attendees</h2>
+                <p>{{ event.name }}</p>
+            </div>
+
+            <span class="attendee-count">
+                {{ attendees|length }} People
+            </span>
+        </div>
+
+        {% if attendees %}
+
+        <div class="attendee-table-wrapper">
+
+            <table class="attendee-table">
+
+                <thead>
+                    <tr>
+                        <th>ATTENDEE</th>
+                        <th>EMAIL ADDRESS</th>
+                        <th>REGISTRATION DATE</th>
+                        <th>STATUS</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for attendee in attendees %}
+
+                    <tr>
+                        <td>
+                            <div class="attendee-name">
+                                <div class="attendee-avatar">
+                                    {{ attendee.name[0]|upper }}
+                                </div>
+                                <strong>{{ attendee.name }}</strong>
+                            </div>
+                        </td>
+
+                        <td>{{ attendee.email }}</td>
+
+                        <td>{{ attendee.registration_date }}</td>
+
+                        <td>
+                            {% if attendee.status == 'Confirmed' %}
+                                <span class="status-badge confirmed">
+                                    ✓ Confirmed
+                                </span>
+                            {% else %}
+                                <span class="status-badge waitlisted">
+                                    ◷ Waitlisted
+                                </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <div class="attendee-empty">
+
+            <div class="empty-icon">♧</div>
+
+            <h3>No registrations yet</h3>
+
+            <p>When people register for this event, they'll appear here.</p>
+
+            <a href="{{ url_for('event_details', event_id=event.id) }}">
+                View Event Details →
+            </a>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</section>
+
+{% endblock %}
 </body>
 </html>

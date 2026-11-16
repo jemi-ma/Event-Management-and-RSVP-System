@@ -1,44 +1,62 @@
 <!DOCTYPE html>
-<html>
-<head>
-    <title>{% block title %}Event Management System{% endblock %}</title>
+<html lang="en">
 
+<head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}Eventora{% endblock %}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+          rel="stylesheet">
 
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/style.css') }}">
+       
 </head>
 
 <body>
 
-<header>
-    <h1>Event Management System</h1>
+    <header class="navbar">
+        <div class="nav-container">
 
-    <nav>
-        <a href="{{ url_for('home') }}">Home</a>
-        <a href="{{ url_for('create_event') }}">Create Event</a>
-        <a href="{{ url_for('view_events') }}">All Events</a>
-        <a href="{{ url_for('event_categories') }}">Upcoming & Past</a>
-        <a href="{{ url_for('dashboard') }}">Dashboard</a>
-    </nav>
-</header>
+            <a href="{{ url_for('home') }}" class="logo">
+                Event<span>ora.</span>
+            </a>
 
-<main class="container">
+            <nav>
+                <a href="{{ url_for('home') }}">Home</a>
+                <a href="{{ url_for('view_events') }}">Explore Events</a>
+                <a href="{{ url_for('event_categories') }}">Upcoming</a>
+                <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            </nav>
+
+            <a href="{{ url_for('create_event') }}" class="nav-button">
+                + Create Event
+            </a>
+
+        </div>
+    </header>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% for category, message in messages %}
-            <p class="{{ category }}">{{ message }}</p>
+            <div class="flash-message {{ category }}">
+                {{ message }}
+            </div>
         {% endfor %}
     {% endwith %}
 
     {% block content %}
     {% endblock %}
 
-</main>
-
-<footer>
-    <p>Event Management & RSVP System</p>
-</footer>
+    <footer class="footer">
+        <h3>Eventora.</h3>
+        <p>Making every event memorable.</p>
+        <p>© 2026 Eventora. All rights reserved.</p>
+    </footer>
 
 </body>
 </html>

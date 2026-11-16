@@ -11,28 +11,103 @@
 </head>
 <body>
 
-   {% extends "base.html" %}
+  {% extends "base.html" %}
 
-{% block title %}Home | Event Management{% endblock %}
+{% block title %}Home | Eventora{% endblock %}
 
 {% block content %}
 
-<div class="card">
-    <h2>Welcome to Event Management System</h2>
-    <p>Create events, manage registrations and track attendees easily.</p>
+<section class="hero">
 
-    <a class="btn" href="{{ url_for('create_event') }}">
-        Create Event
+    <div class="hero-content">
+
+        <span class="hero-tag">
+            ✦ YOUR EVENTS, BEAUTIFULLY ORGANIZED
+        </span>
+
+        <h1>
+            Every Event Has<br>
+            A Story. <span>Let's Create Yours.</span>
+        </h1>
+
+        <p>
+            Discover amazing experiences, manage your events
+            and bring people together — all in one place.
+        </p>
+
+        <div class="hero-buttons">
+
+            <a href="{{ url_for('view_events') }}" class="primary-btn">
+                Explore Events →
+            </a>
+
+            <a href="{{ url_for('create_event') }}" class="secondary-btn">
+                Create an Event
+            </a>
+
+        </div>
+
+    </div>
+
+    <div class="hero-decoration">
+        <div class="decoration-card">
+            <span>✦</span>
+            <h2>Make Moments</h2>
+            <p>That Matter.</p>
+        </div>
+    </div>
+
+</section>
+
+
+<section class="intro-section">
+
+    <span class="section-tag">SIMPLE. SMART. SEAMLESS.</span>
+
+    <h2>Everything you need to manage events.</h2>
+
+    <p>
+        From creating an event to managing registrations,
+        we make the entire process easier.
+    </p>
+
+</section>
+
+
+<section class="feature-grid">
+
+    <div class="feature-card">
+        <div class="feature-icon">✦</div>
+        <h3>Create Events</h3>
+        <p>Organize and manage events with all the important details.</p>
+    </div>
+
+    <div class="feature-card">
+        <div class="feature-icon">♡</div>
+        <h3>Easy Registration</h3>
+        <p>Allow attendees to register and reserve their places.</p>
+    </div>
+
+    <div class="feature-card">
+        <div class="feature-icon">◷</div>
+        <h3>Track Everything</h3>
+        <p>Monitor registrations, capacity and event performance.</p>
+    </div>
+
+</section>
+
+
+<section class="cta-section">
+
+    <h2>Ready to create something memorable?</h2>
+
+    <p>Start planning your next event today.</p>
+
+    <a href="{{ url_for('create_event') }}" class="primary-btn">
+        Get Started →
     </a>
 
-    <a class="btn" href="{{ url_for('view_events') }}">
-        Explore Events
-    </a>
-
-    <a class="btn" href="{{ url_for('dashboard') }}">
-        View Dashboard
-    </a>
-</div>
+</section>
 
 {% endblock %}
 </body>

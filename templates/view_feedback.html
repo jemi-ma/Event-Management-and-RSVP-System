@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Event Feedback | Eventora{% endblock %}
+
+{% block content %}
+
+<div class="feedback-dashboard">
+
+    <div class="feedback-dashboard-header">
+        <span class="feedback-tag">EVENT INSIGHTS</span>
+        <h1>Feedback Overview</h1>
+        <p>See what participants think about {{ event.name }}.</p>
+    </div>
+
+    <div class="feedback-summary">
+
+        <div class="feedback-summary-card">
+            <span>Total Feedback</span>
+            <h2>{{ total_feedback }}</h2>
+        </div>
+
+        <div class="feedback-summary-card">
+            <span>Average Rating</span>
+            <h2>{{ average_rating }} / 5 ⭐</h2>
+        </div>
+
+    </div>
+
+    <div class="feedback-list-section">
+
+        <h2>Participant Reviews</h2>
+
+        {% if feedbacks %}
+
+            {% for item in feedbacks %}
+
+                <div class="feedback-review-card">
+
+                    <div class="review-top">
+                        <div>
+                            <h3>{{ item.name }}</h3>
+                            <span>{{ item.submitted_at }}</span>
+                        </div>
+
+                        <div class="review-rating">
+                            {{ "⭐" * item.rating }}
+                        </div>
+                    </div>
+
+                    <p class="review-comment">
+                        {{ item.comments if item.comments else
+                           "No comments provided." }}
+                    </p>
+
+                </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div class="feedback-empty">
+                <div>💬</div>
+                <h3>No feedback yet</h3>
+                <p>Feedback submitted by participants will appear here.</p>
+            </div>
+
+        {% endif %}
+
+    </div>
+
+    <a href="{{ url_for('event_details', event_id=event.id) }}"
+       class="feedback-dashboard-back">
+        ← Back to Event
+    </a>
+
+</div>
+
+{% endblock %}

@@ -7,48 +7,198 @@
 </head>
 <body>
 
-    <h1>Event Categories</h1>
+    {% extends "base.html" %}
 
-    <h2>Upcoming Events</h2>
+{% block title %}Event Categories | Eventora{% endblock %}
 
-    {% if upcoming_events %}
-        {% for event in upcoming_events %}
-            <div>
-                <h3>{{ event.name }}</h3>
-                <p>Date: {{ event.date }}</p>
-                <p>Venue: {{ event.venue }}</p>
+{% block content %}
 
-                <a href="{{ url_for('event_details', event_id=event.id) }}">
-                    View Details
-                </a>
+<section class="categories-page">
+
+    <!-- HEADER -->
+
+    <div class="categories-header">
+        <span class="section-tag">EXPLORE YOUR EXPERIENCES</span>
+        <h1>Event Categories</h1>
+        <p>Discover what's coming next or revisit the moments that made memories.</p>
+    </div>
+
+    <!-- UPCOMING EVENTS -->
+
+    <div class="category-section">
+
+        <div class="category-heading">
+
+            <div class="category-heading-left">
+                <div class="category-icon upcoming-icon">✦</div>
+
+                <div>
+                    <h2>Upcoming Events</h2>
+                    <p>Experiences waiting to happen.</p>
+                </div>
             </div>
-            <hr>
-        {% endfor %}
-    {% else %}
-        <p>No upcoming events.</p>
-    {% endif %}
 
+            <span class="category-count">
+                {{ upcoming_events|length }} Events
+            </span>
 
-    <h2>Past Events</h2>
+        </div>
 
-    {% if past_events %}
-        {% for event in past_events %}
-            <div>
-                <h3>{{ event.name }}</h3>
-                <p>Date: {{ event.date }}</p>
-                <p>Venue: {{ event.venue }}</p>
+        {% if upcoming_events %}
 
-                <a href="{{ url_for('event_details', event_id=event.id) }}">
-                    View Details
-                </a>
+        <div class="category-grid">
+
+            {% for event in upcoming_events %}
+
+            <div class="category-card upcoming-card">
+
+                <div class="category-card-banner">
+                    <span class="category-label">UPCOMING</span>
+                    <div class="category-date">{{ event.date }}</div>
+                </div>
+
+                <div class="category-card-body">
+
+                    <h3>{{ event.name }}</h3>
+
+                    <div class="category-info">
+                        <span>📍</span>
+                        <p>{{ event.venue }}</p>
+                    </div>
+
+                    <div class="category-info">
+                        <span>♧</span>
+                        <p>Capacity: {{ event.capacity }}</p>
+                    </div>
+
+                    <div class="category-info">
+                        <span>₹</span>
+                        <p>
+                            {% if event.ticket_price|float == 0 %}
+                                Free Entry
+                            {% else %}
+                                ₹{{ "%.2f"|format(event.ticket_price|float) }}
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <a href="{{ url_for('event_details', event_id=event.id) }}"
+                       class="category-view-btn">
+                        View Details →
+                    </a>
+
+                </div>
+
             </div>
-            <hr>
-        {% endfor %}
-    {% else %}
-        <p>No past events.</p>
-    {% endif %}
 
-    <a href="{{ url_for('home') }}">Home</a>
+            {% endfor %}
+
+        </div>
+
+        {% else %}
+
+        <div class="category-empty">
+            <div>✦</div>
+            <h3>No Upcoming Events</h3>
+            <p>There are no upcoming events at the moment. Stay tuned!</p>
+        </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- PAST EVENTS -->
+
+    <div class="category-section past-section">
+
+        <div class="category-heading">
+
+            <div class="category-heading-left">
+                <div class="category-icon past-icon">◷</div>
+
+                <div>
+                    <h2>Past Events</h2>
+                    <p>Take a look at the moments already made.</p>
+                </div>
+            </div>
+
+            <span class="category-count past-count">
+                {{ past_events|length }} Events
+            </span>
+
+        </div>
+
+        {% if past_events %}
+
+        <div class="category-grid">
+
+            {% for event in past_events %}
+
+            <div class="category-card past-card">
+
+                <div class="category-card-banner past-banner">
+                    <span class="category-label past-label">COMPLETED</span>
+                    <div class="category-date">{{ event.date }}</div>
+                </div>
+
+                <div class="category-card-body">
+
+                    <h3>{{ event.name }}</h3>
+
+                    <div class="category-info">
+                        <span>📍</span>
+                        <p>{{ event.venue }}</p>
+                    </div>
+
+                    <div class="category-info">
+                        <span>♧</span>
+                        <p>Capacity: {{ event.capacity }}</p>
+                    </div>
+
+                    <div class="category-info">
+                        <span>₹</span>
+                        <p>
+                            {% if event.ticket_price|float == 0 %}
+                                Free Entry
+                            {% else %}
+                                ₹{{ "%.2f"|format(event.ticket_price|float) }}
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <a href="{{ url_for('event_details', event_id=event.id) }}"
+                       class="category-view-btn past-view-btn">
+                        View Details →
+                    </a>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        {% else %}
+
+        <div class="category-empty past-empty">
+            <div>◷</div>
+            <h3>No Past Events</h3>
+            <p>Your completed events will appear here.</p>
+        </div>
+
+        {% endif %}
+
+    </div>
+
+    <div class="categories-back">
+        <a href="{{ url_for('home') }}">← Back to Home</a>
+    </div>
+
+</section>
+
+{% endblock %}
 
 </body>
 </html>

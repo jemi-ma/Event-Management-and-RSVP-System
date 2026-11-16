@@ -227,7 +227,6 @@ def dashboard():
         total_revenue=total_revenue,
         event_summaries=event_summaries
     )
-
 @app.route('/feedback/<int:event_id>', methods=['GET', 'POST'])
 def submit_feedback(event_id):
 
@@ -241,6 +240,23 @@ def submit_feedback(event_id):
     if selected_event is None:
         return "Event not found", 404
 
+    # Check whether the event has ended
+    try:
+        event_date = datetime.strptime(
+            selected_event['date'], "%Y-%m-%d"
+        ).date()
+
+    except ValueError:
+        flash("Invalid event date.", "danger")
+        return redirect(url_for('event_details', event_id=event_id))
+
+    if event_date >= date.today():
+        flash(
+            "Feedback is available only after the event has ended.",
+            "warning"
+        )
+        return redirect(url_for('event_details', event_id=event_id))
+
     if request.method == 'POST':
 
         name = request.form.get('name', '').strip()
@@ -249,7 +265,9 @@ def submit_feedback(event_id):
 
         if not name or not rating:
             flash("Name and rating are required.", "danger")
-            return redirect(url_for('submit_feedback', event_id=event_id))
+            return redirect(url_for(
+                'submit_feedback', event_id=event_id
+            ))
 
         try:
             rating = int(rating)
@@ -259,27 +277,75 @@ def submit_feedback(event_id):
 
         except ValueError:
             flash("Rating must be between 1 and 5.", "danger")
-            return redirect(url_for('submit_feedback', event_id=event_id))
+            return redirect(url_for(
+                'submit_feedback', event_id=event_id
+            ))
 
         feedback = read_json(FEEDBACK_FILE)
 
         new_feedback = {
+            "id": len(feedback) + 1,
             "event_id": event_id,
             "event_name": selected_event['name'],
             "name": name,
             "rating": rating,
-            "comments": comments
+            "comments": comments,
+            "submitted_at": date.today().isoformat()
         }
 
         feedback.append(new_feedback)
 
         if write_json(FEEDBACK_FILE, feedback):
             flash("Thank you for your feedback!", "success")
-            return redirect(url_for('event_details', event_id=event_id))
+            return redirect(url_for(
+                'event_details', event_id=event_id
+            ))
 
         flash("Unable to save feedback.", "danger")
 
-    return render_template('feedback.html', event=selected_event)
+    return render_template(
+        'feedback.html',
+        event=selected_event
+    )
+
+
+@app.route('/feedbacks/<int:event_id>')
+def view_feedback(event_id):
+
+    events = read_json(EVENTS_FILE)
+
+    selected_event = next(
+        (event for event in events if event['id'] == event_id),
+        None
+    )
+
+    if selected_event is None:
+        return "Event not found", 404
+
+    all_feedback = read_json(FEEDBACK_FILE)
+
+    event_feedback = [
+        item for item in all_feedback
+        if item['event_id'] == event_id
+    ]
+
+    total_feedback = len(event_feedback)
+
+    average_rating = (
+        round(
+            sum(item['rating'] for item in event_feedback)
+            / total_feedback, 1
+        )
+        if total_feedback > 0 else 0
+    )
+
+    return render_template(
+        'view_feedback.html',
+        event=selected_event,
+        feedbacks=event_feedback,
+        total_feedback=total_feedback,
+        average_rating=average_rating
+    )
 
 def count_confirmed(event_id):
 

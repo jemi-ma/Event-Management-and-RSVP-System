@@ -1,1 +1,11 @@
-[]
+[
+    {
+        "id": 1,
+        "event_id": 1,
+        "event_name": "Python Workshop",
+        "name": "Jemima",
+        "rating": 3,
+        "comments": "Nice",
+        "submitted_at": "2026-11-16"
+    }
+]

@@ -11,36 +11,182 @@
 </head>
 
 <body>
+   {% extends "base.html" %}
+
+{% block title %}{{ event.name }} | Eventora{% endblock %}
+
+{% block content %}
+
+<section class="event-detail-page">
+
+    <!-- BREADCRUMB -->
+
+    <div class="event-breadcrumb">
+        <a href="{{ url_for('view_events') }}">Explore Events</a>
+        <span>/</span>
+        <span>{{ event.name }}</span>
+    </div>
+
+    <!-- FLASH MESSAGES -->
+
     {% with messages = get_flashed_messages(with_categories=true) %}
-    {% for category, message in messages %}
-        <p class="{{ category }}">{{ message }}</p>
-    {% endfor %}
-{% endwith %}
+        {% for category, message in messages %}
+            <div class="detail-alert {{ category }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endwith %}
 
-    <h1>{{ event.name }}</h1>
+    <!-- EVENT HERO -->
 
-    <p>Date: {{ event.date }}</p>
+    <div class="detail-hero">
 
-    <p>Venue: {{ event.venue }}</p>
+        <div class="detail-hero-content">
 
-    <p>Capacity: {{ event.capacity }}</p>
+            <span class="section-tag">✦ EVENT DETAILS</span>
 
-    <p>Description: {{ event.description }}</p>
+            <h1>{{ event.name }}</h1>
 
-    <p>Ticket Price: ₹{{ event.ticket_price }}</p>
+            <p>
+                {{ event.description or 'Join us for an unforgettable experience!' }}
+            </p>
 
-    <a href="{{ url_for('register_attendee', event_id=event.id) }}">
-        <button>Register / RSVP</button>
-    </a>
+            <div class="detail-hero-date">
+                <span>📅</span>
+                {{ event.date }}
+            </div>
 
-    <a href="{{ url_for('view_events') }}">Back to Events</a>
-    <a href="{{ url_for('view_attendees', event_id=event.id) }}">
-    View Attendees
-    </a>
-    <a class="btn"
-   href="{{ url_for('submit_feedback', event_id=event.id) }}">
-   Give Feedback
-    </a>
+        </div>
+
+        <div class="detail-hero-decoration">
+            <div class="detail-decoration-card">
+                <span>✦</span>
+                <h3>Make Moments</h3>
+                <p>That Matter.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- EVENT INFORMATION -->
+
+    <div class="detail-content-grid">
+
+        <div class="detail-main-card">
+
+            <h2>About This Event</h2>
+
+            <p class="detail-description">
+                {{ event.description or 'More details about this event will be available soon.' }}
+            </p>
+
+            <div class="detail-divider"></div>
+
+            <h2>Event Information</h2>
+
+            <div class="detail-info-grid">
+
+                <div class="detail-info-item">
+                    <span class="detail-info-icon">📅</span>
+                    <div>
+                        <small>EVENT DATE</small>
+                        <h3>{{ event.date }}</h3>
+                    </div>
+                </div>
+
+                <div class="detail-info-item">
+                    <span class="detail-info-icon">📍</span>
+                    <div>
+                        <small>VENUE</small>
+                        <h3>{{ event.venue }}</h3>
+                    </div>
+                </div>
+
+                <div class="detail-info-item">
+                    <span class="detail-info-icon">♧</span>
+                    <div>
+                        <small>CAPACITY</small>
+                        <h3>{{ event.capacity }} People</h3>
+                    </div>
+                </div>
+
+                <div class="detail-info-item">
+                    <span class="detail-info-icon">₹</span>
+                    <div>
+                        <small>TICKET PRICE</small>
+                        <h3>
+                            {% if event.ticket_price|float == 0 %}
+                                Free Entry
+                            {% else %}
+                                ₹{{ "%.2f"|format(event.ticket_price|float) }}
+                            {% endif %}
+                        </h3>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- REGISTRATION CARD -->
+
+        <aside class="registration-card">
+
+            <span class="section-tag">BE PART OF IT</span>
+
+            <h2>Ready to Join?</h2>
+
+            <p>
+                Don't miss out on this experience.
+                Register now and reserve your place!
+            </p>
+
+            <div class="registration-price">
+
+                <small>TICKET PRICE</small>
+
+                <h2>
+                    {% if event.ticket_price|float == 0 %}
+                        Free
+                    {% else %}
+                        ₹{{ "%.2f"|format(event.ticket_price|float) }}
+                    {% endif %}
+                </h2>
+
+            </div>
+
+            <a href="{{ url_for('register_attendee', event_id=event.id) }}"
+               class="detail-primary-btn">
+                Register / RSVP →
+            </a>
+
+            <a href="{{ url_for('view_attendees', event_id=event.id) }}"
+               class="detail-secondary-btn">
+                View Attendees
+            </a>
+
+            <a href="{{ url_for('submit_feedback', event_id=event.id) }}"
+               class="detail-feedback-btn">
+                Give Feedback
+            </a>
+            <a href="{{ url_for('view_feedback', event_id=event.id) }}"
+   class="event-details-btn">
+    View Feedback
+</a>
+
+        </aside>
+
+    </div>
+
+    <!-- BACK LINK -->
+
+    <div class="detail-back">
+        <a href="{{ url_for('view_events') }}">← Back to All Events</a>
+    </div>
+
+</section>
+
+{% endblock %}
 
 </body>
 

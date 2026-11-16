@@ -11,29 +11,148 @@
 
 <body>
 
-    <h1>Register for {{ event.name }}</h1>
+    {% extends "base.html" %}
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% for category, message in messages %}
-            <p class="{{ category }}">{{ message }}</p>
-        {% endfor %}
-    {% endwith %}
+{% block title %}Register | {{ event.name }}{% endblock %}
 
-    <form method="POST">
+{% block content %}
 
-        <label>Your Name</label>
-        <input type="text" name="name" required>
+<section class="rsvp-page">
 
-        <br><br>
+    <div class="rsvp-breadcrumb">
+        <a href="{{ url_for('view_events') }}">Explore Events</a>
+        <span>/</span>
+        <a href="{{ url_for('event_details', event_id=event.id) }}">
+            {{ event.name }}
+        </a>
+        <span>/ Register</span>
+    </div>
 
-        <label>Email Address</label>
-        <input type="email" name="email" required>
+    <div class="rsvp-heading">
+        <span class="section-tag">✦ SECURE YOUR SPOT</span>
+        <h1>Join the Experience.</h1>
+        <p>Just a few details and you're ready to be part of something special.</p>
+    </div>
 
-        <br><br>
+    <div class="rsvp-layout">
 
-        <button type="submit">Register Now</button>
+        <!-- REGISTRATION FORM -->
 
-    </form>
+        <div class="rsvp-form-card">
+
+            <h2>Attendee Information</h2>
+            <p class="rsvp-subtitle">Please enter your details below.</p>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% for category, message in messages %}
+                    <div class="detail-alert {{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endwith %}
+
+            <form method="POST"
+                  action="{{ url_for('register_attendee', event_id=event.id) }}">
+
+                <div class="rsvp-form-group">
+                    <label for="name">Full Name <span>*</span></label>
+                    <input type="text"
+                           id="name"
+                           name="name"
+                           placeholder="Enter your full name"
+                           required>
+                </div>
+
+                <div class="rsvp-form-group">
+                    <label for="email">Email Address <span>*</span></label>
+                    <input type="email"
+                           id="email"
+                           name="email"
+                           placeholder="you@example.com"
+                           required>
+                </div>
+
+                <div class="rsvp-note">
+                    <span>✦</span>
+                    Your registration details will be used only for event management.
+                </div>
+
+                <button type="submit" class="rsvp-submit-btn">
+                    Confirm Registration →
+                </button>
+
+                <a href="{{ url_for('event_details', event_id=event.id) }}"
+                   class="rsvp-cancel-btn">
+                    Back to Event Details
+                </a>
+
+            </form>
+
+        </div>
+
+        <!-- EVENT SUMMARY -->
+
+        <aside class="rsvp-event-card">
+
+            <div class="rsvp-event-top">
+                <span class="section-tag">YOUR SELECTED EVENT</span>
+                <div class="rsvp-event-icon">✦</div>
+            </div>
+
+            <h2>{{ event.name }}</h2>
+
+            <p class="rsvp-event-description">
+                {{ event.description or 'Be part of this memorable experience.' }}
+            </p>
+
+            <div class="rsvp-event-divider"></div>
+
+            <div class="rsvp-event-detail">
+                <span>📅</span>
+                <div>
+                    <small>EVENT DATE</small>
+                    <p>{{ event.date }}</p>
+                </div>
+            </div>
+
+            <div class="rsvp-event-detail">
+                <span>📍</span>
+                <div>
+                    <small>VENUE</small>
+                    <p>{{ event.venue }}</p>
+                </div>
+            </div>
+
+            <div class="rsvp-event-detail">
+                <span>♧</span>
+                <div>
+                    <small>CAPACITY</small>
+                    <p>{{ event.capacity }} People</p>
+                </div>
+            </div>
+
+            <div class="rsvp-price-box">
+                <small>TICKET PRICE</small>
+                <h2>
+                    {% if event.ticket_price|float == 0 %}
+                        Free Entry
+                    {% else %}
+                        ₹{{ "%.2f"|format(event.ticket_price|float) }}
+                    {% endif %}
+                </h2>
+            </div>
+
+            <p class="rsvp-footer-note">
+                ✨ We look forward to seeing you there!
+            </p>
+
+        </aside>
+
+    </div>
+
+</section>
+
+{% endblock %}
 
 </body>
 

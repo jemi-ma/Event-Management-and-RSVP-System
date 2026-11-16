@@ -7,71 +7,156 @@
 </head>
 <body>
 
-    <h1>Event Management Dashboard</h1>
+    {% extends "base.html" %}
 
-    <h2>Overall Statistics</h2>
+{% block title %}Dashboard | Eventora{% endblock %}
 
-    <div>
-        <h3>Total Events</h3>
-        <p>{{ total_events }}</p>
+{% block content %}
+
+<div class="dashboard-container">
+
+    <div class="dashboard-header">
+        <div>
+            <span class="section-tag">OVERVIEW</span>
+            <h1>Dashboard</h1>
+            <p>Here's what's happening with your events.</p>
+        </div>
+
+        <a href="{{ url_for('create_event') }}" class="primary-btn">
+            + Create Event
+        </a>
     </div>
 
-    <div>
-        <h3>Total Registrations</h3>
-        <p>{{ total_registrations }}</p>
+    <!-- STATISTICS -->
+
+    <div class="stats-grid">
+
+        <div class="stat-card">
+            <div class="stat-icon purple">✦</div>
+            <p>Total Events</p>
+            <h2>{{ total_events }}</h2>
+            <span>Events created</span>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon blue">♧</div>
+            <p>Total Registrations</p>
+            <h2>{{ total_registrations }}</h2>
+            <span>All registrations</span>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon green">✓</div>
+            <p>Confirmed Attendees</p>
+            <h2>{{ total_confirmed }}</h2>
+            <span>Seats confirmed</span>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon orange">◷</div>
+            <p>Waitlisted</p>
+            <h2>{{ total_waitlisted }}</h2>
+            <span>Waiting for seats</span>
+        </div>
+
     </div>
 
-    <div>
-        <h3>Confirmed Attendees</h3>
-        <p>{{ total_confirmed }}</p>
+    <!-- REVENUE -->
+
+    <div class="revenue-card">
+        <div>
+            <span>ESTIMATED TOTAL REVENUE</span>
+            <h2>₹{{ "%.2f"|format(total_revenue) }}</h2>
+            <p>Based on confirmed registrations</p>
+        </div>
+
+        <div class="revenue-icon">₹</div>
     </div>
 
-    <div>
-        <h3>Waitlisted Attendees</h3>
-        <p>{{ total_waitlisted }}</p>
+    <!-- EVENT SUMMARY -->
+
+    <div class="summary-section">
+
+        <div class="summary-heading">
+            <div>
+                <h2>Event Summary</h2>
+                <p>Registration and revenue details for each event.</p>
+            </div>
+
+            <a href="{{ url_for('view_events') }}">View All Events →</a>
+        </div>
+
+        {% if event_summaries %}
+
+        <div class="table-wrapper">
+
+            <table class="dashboard-table">
+
+                <thead>
+                    <tr>
+                        <th>Event Name</th>
+                        <th>Registered</th>
+                        <th>Confirmed</th>
+                        <th>Waitlisted</th>
+                        <th>Revenue</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for event in event_summaries %}
+
+                    <tr>
+                        <td class="event-name">
+                            {{ event.event_name }}
+                        </td>
+
+                        <td>{{ event.total_registered }}</td>
+
+                        <td>
+                            <span class="status confirmed">
+                                {{ event.confirmed }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <span class="status waitlisted">
+                                {{ event.waitlisted }}
+                            </span>
+                        </td>
+
+                        <td class="revenue-value">
+                            ₹{{ "%.2f"|format(event.revenue) }}
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <div class="empty-state">
+            <div>✦</div>
+            <h3>No events yet</h3>
+            <p>Create your first event to see its statistics here.</p>
+
+            <a href="{{ url_for('create_event') }}" class="primary-btn">
+                Create Your First Event
+            </a>
+        </div>
+
+        {% endif %}
+
     </div>
 
-    <div>
-        <h3>Total Estimated Revenue</h3>
-        <p>₹{{ "%.2f"|format(total_revenue) }}</p>
-    </div>
+</div>
 
-    <hr>
-
-    <h2>Individual Event Summary</h2>
-
-    {% if event_summaries %}
-
-        <table border="1" cellpadding="10">
-
-            <tr>
-                <th>Event Name</th>
-                <th>Total Registered</th>
-                <th>Confirmed</th>
-                <th>Waitlisted</th>
-                <th>Revenue</th>
-            </tr>
-
-            {% for event in event_summaries %}
-
-            <tr>
-                <td>{{ event.event_name }}</td>
-                <td>{{ event.total_registered }}</td>
-                <td>{{ event.confirmed }}</td>
-                <td>{{ event.waitlisted }}</td>
-                <td>₹{{ "%.2f"|format(event.revenue) }}</td>
-            </tr>
-
-            {% endfor %}
-
-        </table>
-
-    {% else %}
-
-        <p>No events available.</p>
-
-    {% endif %}
-
+{% endblock %}
     <br>
 
     <a href="{{ url_for('home') }}">Back to Home</a>
