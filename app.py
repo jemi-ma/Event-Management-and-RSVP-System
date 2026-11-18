@@ -1,4 +1,4 @@
-a"""
+"""
 Eventora - Event Management & RSVP System
 
 Flask application entry point.
